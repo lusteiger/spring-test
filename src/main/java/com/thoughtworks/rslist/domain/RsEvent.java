@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.validator.constraints.UniqueElements;
 
 import javax.validation.constraints.NotNull;
 import java.io.Serializable;
@@ -17,6 +18,7 @@ public class RsEvent implements Serializable {
   @NotNull private String keyword;
   private int voteNum;
   @NotNull private int userId;
+
   private int rank;
   private int amount;
 }

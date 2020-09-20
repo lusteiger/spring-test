@@ -66,17 +66,28 @@ class RsControllerTest {
     public void shouldGetRsEventList() throws Exception {
         UserDto save = userRepository.save(userDto);
 
-        RsEventDto rsEventDto =
-                RsEventDto.builder().keyword("无分类").eventName("第一条事件").user(save).build();
+        RsEventDto rsEventDto1 =
+                RsEventDto.builder()
+                        .id(1)
+                        .keyword("无分类").eventName("第一条事件").user(save)
+                        .rank(1)
+                        .amount(100)
+                        .build();
+        RsEventDto rsEventDto2 =
+                RsEventDto.builder()
+                        .id(2)
+                        .keyword("无分类").eventName("第二条事件").user(save)
+                        .rank(2)
+                        .amount(100)
+                        .build();
 
-        rsEventRepository.save(rsEventDto);
-
+        rsEventRepository.save(rsEventDto1);
+        rsEventRepository.save(rsEventDto2);
         mockMvc
                 .perform(get("/rs/list"))
-                .andExpect(jsonPath("$", hasSize(1)))
+                .andExpect(jsonPath("$", hasSize(2)))
                 .andExpect(jsonPath("$[0].eventName", is("第一条事件")))
-                .andExpect(jsonPath("$[0].keyword", is("无分类")))
-                .andExpect(jsonPath("$[0]", not(hasKey("user"))))
+                .andExpect(jsonPath("$[1].eventName", is("第二条事件")))
                 .andExpect(status().isOk());
     }
 
