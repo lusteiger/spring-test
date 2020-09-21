@@ -90,6 +90,53 @@ class RankControllerTest {
 
     }
 
+
+    @Test
+    public void shouldPurchaseRangeWithHasOnePurchaseSuccess() throws Exception {
+        Trade trade = Trade.builder()
+                .amount(300)
+                .rank(1)
+                .eventId(1)
+                .build();
+
+        RsEventDto rsEventDto1 = RsEventDto.builder()
+                .eventName("事件2")
+                .keyword("娱乐")
+                .amount(100)
+                .rank(2)
+                .build();
+
+        RsEventDto rsEventDto2 = RsEventDto.builder()
+                .eventName("事件1")
+                .keyword("哈哈")
+                .rank(1)
+                .amount(99)
+                .build();
+
+        rsEventRepository.save(rsEventDto1);
+        rsEventRepository.save(rsEventDto2);
+        ObjectMapper objectMapper = new ObjectMapper();
+        String json = objectMapper.writeValueAsString(trade);
+        mockMvc.perform(post("/rs/rank/buy").content(json)
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk());
+
+        mockMvc.perform(get("/rs/rank/list"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$", hasSize(1)))
+                .andExpect(jsonPath("[0].rank", is(trade.getRank())))
+                .andExpect(jsonPath("[0].amount", is(trade.getAmount())));
+
+        mockMvc.perform(get("/rs/list"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$", hasSize(1)))
+                .andExpect(jsonPath("[0].rank", is(trade.getRank())))
+                .andExpect(jsonPath("[0].amount", is(trade.getAmount())));
+
+    }
+
+
+
     @Test
     public void shouldFailedUseEqualsAmount() throws Exception {
         Trade trade = Trade.builder()

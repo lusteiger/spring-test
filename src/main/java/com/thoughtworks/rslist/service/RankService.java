@@ -23,20 +23,31 @@ public class RankService {
 
     public ResponseEntity<Trade> BuyRank(Tradedto tradedto) {
 
-        Optional<RsEventDto> rsEvent = rsEventRepository.findById(tradedto.getEventId());
-        if (!rsEvent.isPresent()) {
+        Optional<RsEventDto> OldrsEvent = rsEventRepository.findById(tradedto.getEventId());
+        if (!OldrsEvent.isPresent()) {
             return ResponseEntity.status(400).build();
         }
 
-        RsEventDto rsEventdto = rsEvent.get();
+        Optional<RsEventDto> newEvent = rsEventRepository.findByRank(tradedto.getRank());
+
+
+        RsEventDto rsEventdto = OldrsEvent.get();
+
+
         if (rsEventdto.getAmount() >= tradedto.getAmount())
             return ResponseEntity.status(400).build();
+
+
+        if (newEvent.isPresent())
+            rsEventRepository.deleteAllByRank(tradedto.getRank());
+
 
         rsEventdto.setAmount(tradedto.getAmount());
         rsEventdto.setRank(tradedto.getRank());
 
         rsEventRepository.save(rsEventdto);
         Tradedto result = rankrepository.save(tradedto);
+
 
         Trade trade = Trade.builder()
                 .eventId(result.getEventId())
